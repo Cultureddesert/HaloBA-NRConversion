@@ -1,6 +1,7 @@
 # Halo: Bolt Action – New Recruit game system
 
 Generated from `Unit_cost_calculator_v3_7.html`.
+All credit to nightovizard
 
 Files
 - `Halo Bolt Action.gst` – game system (points cost type, Weapon/Unit profile types, categories, force layout, 114 weapon profiles, all shared rules)
