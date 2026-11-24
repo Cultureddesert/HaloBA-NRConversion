@@ -1,7 +1,6 @@
 # Halo: Bolt Action – New Recruit game system
 
 Generated from `Unit_cost_calculator_v3_7.html`.
-All credit to nightovizard
 
 Files
 - `Halo Bolt Action.gst` – game system (points cost type, Weapon/Unit profile types, categories, force layout, 114 weapon profiles, all shared rules)
@@ -15,6 +14,14 @@ Loading
 Not ported from the HTML (needs manual work in the editor)
 - Simplified-validation toggle (New Recruit always shows every error; they are warnings, not blocks), PDF export (New Recruit has its own)
 - Rules that conflict with each other are noted in the upgrade's comment, not enforced
+
+Datasheet and editing
+- Models: squads have a "Models" counter that starts at the minimum unit size and goes up to the maximum. The unit profile's Models value shows the current count (team upgrades that add a crew member count too). Each veterancy option shows the unit's full starting cost in its description; its own price is what's left after the models are paid for (so squads show 0 there and the per-model price changes with veterancy).
+- Damage Value: infantry and teams show 3+/4+/5+ for Inexperienced/Regular/Veteran, or 6+ with Resilient. Vehicles show their listed value.
+- Per-model costs: squad upgrades are per model unless the HTML marks them flat, and per-model prices follow the model count (doctrines and armoury items too).
+- Options are split into sections: Veterancy, Doctrine, NCO Weapon, Squad Upgrades, Weapon Replacements, Vehicle Upgrades, Weapon Upgrades, Armoury, Leader Melee Upgrade.
+- Weapons: each unit lists one profile per weapon with a Qty column. Squads start with every model on the default weapon; NCO swaps, weapon replacements, M301 packages, vehicle and team upgrades move models between weapons. A weapon that's fully replaced disappears; optional weapons appear once taken. Units whose officers may choose their weapon list each choice as "(may choose)", like the HTML. Melee weapons aren't listed, like the HTML.
+- Lists made with an earlier version of these files: the old "Additional Models" option became "Models", so re-check unit sizes in saved lists.
 
 Army validation (ported)
 New Recruit flags these as list errors, same as the HTML's "illegal list" warnings:
