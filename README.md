@@ -22,7 +22,9 @@ Datasheet and editing
 - Damage Value: infantry and teams show 3+/4+/5+ for Inexperienced/Regular/Veteran, or 6+ with Resilient. Vehicles show their listed value.
 - Per-model costs: squad upgrades are per model unless the HTML marks them flat, and per-model prices follow the model count (doctrines and armoury items too).
 - Options are split into sections: Veterancy, Doctrine, NCO Weapon, Squad Upgrades, Weapon Replacements, Vehicle Upgrades, Weapon Upgrades, Armoury, Leader Melee Upgrade.
-- Weapons: each unit lists one profile per weapon with a Qty column. Squads start with every model on the default weapon; NCO swaps, weapon replacements, M301 packages, vehicle and team upgrades move models between weapons. A weapon that's fully replaced disappears; optional weapons appear once taken. Units whose officers may choose their weapon list each choice as "(may choose)", like the HTML. Melee weapons aren't listed, like the HTML.
+- Weapons: each unit lists one profile per weapon with a Qty column. Squads start with every model on the default weapon; NCO swaps, weapon replacements, M301 packages, vehicle and team upgrades move models between weapons. A weapon that's fully replaced disappears; optional weapons appear once taken. Melee weapons aren't listed, like the HTML.
+- Leaders who choose their weapons (Officers, Medics, Forward Observers, Watchers, Chaplains, Bloodhandlers): the leader picks in "NCO Weapon" (defaults to the first weapon), and each extra model picks in "Model Weapons". The number of picks must match the extra models (an error shows until it does). For UNSC, M301 packages are among the Model Weapons picks. Only the picked weapons are shown.
+- Weapon rules (e.g. Range Finder, Howitzer) appear in a unit's rules only for weapons it carries: starting weapons' rules are on the unit, and an option that adds a weapon brings that weapon's rules with it.
 - Lists made with an earlier version of these files: the old "Additional Models" option became "Models", so re-check unit sizes in saved lists.
 
 Army validation (ported)
