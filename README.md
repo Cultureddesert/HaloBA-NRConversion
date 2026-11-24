@@ -2,6 +2,8 @@
 
 Generated from `Unit_cost_calculator_v3_7.html`.
 
+Credit to nightovizard.
+
 Files
 - `Halo Bolt Action.gst` – game system (points cost type, Weapon/Unit profile types, categories, force layout, 114 weapon profiles, all shared rules)
 - `Halo - UNSC.cat`, `Halo - Covenant.cat`, `Halo - Banished.cat`, `Halo - Forerunner.cat`, `Halo - Flood.cat` – armies (193 units/vehicles total)
