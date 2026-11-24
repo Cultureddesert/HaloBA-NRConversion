@@ -1,5 +1,31 @@
 const fs = require('fs'), crypto = require('crypto'), path = require('path');
 const O = require('./out.json');
+const PDF_ADDED_UNITS = [];
+// Points from the v3.7 army books where the HTML differs
+const COST_OVERRIDES = { 'UNSC_VEHICLES|AV-49 Wasp': { Veteran: 135 } };
+// Option costs from the v3.7 army books / Optional Rules v1.8 where the HTML differs or is missing an option
+const OPTION_FIXES = [
+  ['FLOOD_UNITS', 'Elite Combat Form Squad', u => {
+    u.options.weaponReplacements = u.options.weaponReplacements || {};
+    u.options.weaponReplacements['Unarmed'] = { max: 5, cost: -8, replaces: 'Plasma Rifle', grants: 'Unarmed' };
+    if (u.options.ncoReplacement && !u.options.ncoReplacement.options.includes('Unarmed')) { u.options.ncoReplacement.options.push('Unarmed'); u.options.ncoReplacement.costs['Unarmed'] = -8; }
+  }],
+  ['COVENANT_UNITS', 'Brute Attached Leader (Optional rules)', u => Object.assign(u.options.ncoReplacement.costs, { 'Mauler': -6, 'Covenant Carbine': -4, 'Plasma Rifle': -1 })],
+  ['BANISHED_UNITS', 'Brute Attached Leader (Optional rules)', u => Object.assign(u.options.ncoReplacement.costs, { 'Mangler': -5, 'Pulse Carbine': -3, 'Plasma Rifle': -1 })],
+];
+for (const [arr, name, fix] of OPTION_FIXES) { const u = O[arr].find(x => x.name === name); if (u) fix(u); else console.log('option fix target missing:', arr, name); }
+for (const [key, c] of Object.entries(COST_OVERRIDES)) {
+  const [arr, name] = key.split('|'); const u = O[arr].find(x => x.name === name);
+  if (u) Object.assign(u.costs, c); else console.log('cost override target missing:', key);
+}
+if (!O.BANISHED_UNITS.some(u => u.name === 'Flamethrower Team')) {
+  const at = O.BANISHED_UNITS.findIndex(u => u.name === 'Machine Gun Team');
+  O.BANISHED_UNITS.splice(at < 0 ? O.BANISHED_UNITS.length : at, 0, {
+    name: 'Flamethrower Team', type: 'Team', allowedVeterancy: ['Regular', 'Veteran'], costs: { Regular: 60, Veteran: 75 },
+    baseMen: 2, maxMen: 2, weapons: [{ name: 'Ravager' }], specialRules: ['Team Weapon', 'Forged In Chains', 'Flamethrower']
+  });
+  PDF_ADDED_UNITS.push('Banished Flamethrower Team');
+}
 const SRC = fs.readFileSync('data.js', 'utf8');
 const OUTDIR = process.env.OUTDIR || '..';
 fs.mkdirSync(OUTDIR, { recursive: true });
@@ -32,6 +58,35 @@ const wd = O.weaponSpecialDescriptions, ud = O.unitSpecialDescriptions;
 const ruleDesc = {};
 for (const [k, v] of Object.entries(ud)) ruleDesc[k] = v;
 for (const [k, v] of Object.entries(wd)) ruleDesc[k] = v;
+// Text for rules the HTML has no description for, taken from the Halo: Bolt Action PDFs
+// (Rulebook v3.7 "Vehicle Special Rules", army books v3.7).
+const PDF_RULES = {
+  'Agile': 'A vehicle with this rule may make an additional 90-degree pivot during its movement and is capable of pivoting 90-degrees on a Fire order.',
+  'Command Vehicle': "Vehicles with this rule are equipped with enhanced communication systems that provide a morale bonus of +1 to themselves and all friendly vehicles within 12\". Additionally, a Command Vehicle can issue one 'You men, snap to action!' order to a single friendly vehicle within 12\", except other Command Vehicles.",
+  'Impulse Drive': "At the start of this vehicle's activation, you may declare Impulse Drive. During this activation, when this unit Advances or Runs it ignores other models and terrain for movement (distances unchanged; no road bonus), but it cannot end its move on impassable terrain, in buildings, in rough ground, or within 1\" of enemy units (unless assaulting per assault walker rules). Any Ambush fire resolved during this movement treats the vehicle as in the open (no cover saves); after it finishes moving, resolve cover normally for subsequent attacks.",
+  'Nimble': "Aircraft with this rule are exceptionally agile. This aircraft's Evasion save improves by +1 (4+ instead of 5+).",
+  'Open-topped': 'Vehicles with this rule are more vulnerable to attacks and offer less protection to their occupants. They are pinned by small-arms fire like soft-skinned vehicles and automatically destroyed in assaults if damaged. If hit on the top armor, they suffer an additional +1 to the damage roll and damage table.',
+  'Faster': 'Vehicles with the Faster rule benefit from enhanced mobility. Fast vehicles can move 12" with an Advance order and 24" with a Run order.',
+  'Slower': 'Vehicles with this rule are less mobile, moving only 6" with an Advance order and 12" with a Run order.',
+  'Fist': 'Some walkers are equipped with powerful mechanical fists designed for devastating close-quarters combat. Walkers with this rule gain an additional attack dice in close quarters for each fist they possess. This rule only applies in close combat.',
+  'Recce': 'Reconnaissance vehicles can perform special escape reactions when shot at, moving with an Advance or Run order to avoid damage. They may also reverse at full Advance speed. Specific rules for their escape reactions apply during shooting and assaults, as detailed in the main rules.',
+  'Reinforced Front Armour': 'Vehicles with this rule count their front armor as 1 higher than their listed value against all shots hitting the front arc.',
+  'Shielded Hull': 'When resolving a shooting attack against this vehicle, if this vehicle had no Pin markers when the attack was declared, reduce the Penetration value of each hit by 1, to a minimum of 0. If this vehicle had one or more Pin markers when the attack was declared, this rule has no effect.',
+  'Sustained Beam': 'If an AT Gun on this unit hits its target, draw a straight line from this unit to that target. Each other enemy unit crossed by the line may also be hit; make a separate To Hit roll at -1 for each, plus any other modifiers that may apply. Flying Aircraft are ignored for this rule. If the original target is a Flying Aircraft, this rule does not apply.',
+  'Weak Sides': 'Vehicles with this rule have vulnerable side armor. Attacks against the sides count as hitting the rear, gaining a +2 penetration modifier instead of +1.',
+  'All-Terrain': 'Wheeled vehicles with this rule may enter and move through rough ground with an Advance order, but may still not Run through rough ground.',
+  'Rappelling Lines': 'While Flying, if this Aircraft has not moved yet this turn, transported Infantry units may disembark from it as though it were Landed.',
+  'Gravity Lift': 'While Flying, if this Aircraft has not moved yet this turn, transported infantry units may disembark from it as though it were Landed.',
+  'Scrap Armour Screens': 'Weapons with Shaped Charge do not gain +1 Penetration bonus for hitting this vehicle in the side arc.',
+  'For Humanity’s Survival!': 'This unit may be customized to represent a UNSC sub-faction (Troopers, Recon, Marines, ODSTs or Spartans). Choose its doctrine in the unit options. Apply all associated rules and point costs to every model in the squad; mixed designations are not allowed within the same unit.',
+  'For The Great Journey!': 'This unit may be customized to represent a Covenant warrior caste (Grunts/Jackals, Skirmishers, Elites or Brutes). Choose its doctrine in the unit options. Apply all associated rules and point costs to every model in the squad; mixed designations are not allowed within the same unit.',
+  'Forged In Chains': 'This unit may be customized to represent a Banished warrior caste (Grunts/Jackals, Skirmishers, Elites or Brutes). Choose its doctrine in the unit options. Apply all associated rules and point costs to every model in the squad; mixed designations are not allowed within the same unit.',
+  // Bolt Action 3rd Edition core rules (BA3 rulebook p151 / p149)
+  'Slow Load': 'Some vehicles have very powerful guns, but their loading mechanisms cannot move their huge shells fast enough to keep up a high rate of fire. The vehicle cannot be given an order until at least one other unit on the same side has already been given orders (whether successfully or not). If an army is left with a number of units which all have the Slow Load special rule, when the army receives its first order dice of the turn, put the dice back in the bag and draw again. The next dice drawn for that army can then be allocated to a model with slow load as if another unit had already been ordered. (Bolt Action Rulebook V3, p151)',
+  'Unreliable': 'If the vehicle suffers one or more pin markers as a result of an enemy attack, it automatically suffers one further pin marker in addition, such is its extreme operational unreliability. (Bolt Action Rulebook V3, p151)',
+  'Medical Vehicle': 'Being in proximity of an ambulance means that any wounded soldiers nearby have a chance of being treated by a medic or stretcher bearer from amongst the crew of the ambulance. All infantry and artillery units within 6" of the vehicle count as within 6" of a medic. Ambulances are destroyed if they end their turn closer to enemy units than to friendly units. (Bolt Action Rulebook V3, p149)',
+};
+for (const [k, v] of Object.entries(PDF_RULES)) if (!ruleDesc[k]) ruleDesc[k] = v;
 const ruleIds = {};          // name -> id
 const stubRules = new Set();
 function ensureRule(name) {
@@ -831,6 +886,7 @@ function buildUnit(fac, arr, u, ctx) {
     entries.push(...rEntries);
     if (wEntries.length) groups.push(group('Weapon Upgrades', cid('g|wu|' + uid), { entries: wEntries, constraints: [con('max', o.maxWeaponUpgrades, 'parent', 'wumax' + uid)] }));
   }
+  if (u._note) notes.push(u._note);
   if (o.optionNotes) notes.push(String(typeof o.optionNotes === 'string' ? o.optionNotes : JSON.stringify(o.optionNotes)));
   if (u.requiresArmyBonus) notes.push('Requires army option: ' + u.requiresArmyBonus);
   if (u.forceOrgSlot) notes.push('Force org slot: ' + u.forceOrgSlot);
@@ -841,6 +897,10 @@ function buildUnit(fac, arr, u, ctx) {
   // visibility modifiers
   const mods = [];
   if (u.requiresArmyBonus && ctx.variantIds[u.requiresArmyBonus]) mods.push(hideWhen([condAtLeast(ctx.variantIds[u.requiresArmyBonus], 'force', 'lessThan')]));
+  // Army restrictions: Insurrection may not include Spartans, Swords of Sanghelios may not include Brutes
+  if (fac === 'UNSC' && ctx.variantIds.Insurrection && /spartan/.test(lc(u.name))) mods.push(hideWhen([condAtLeast(ctx.variantIds.Insurrection, 'force')]));
+  if (fac === 'Covenant' && ctx.variantIds['Swords of Sanghelios'] && /brute/.test(lc(u.name))) mods.push(hideWhen([condAtLeast(ctx.variantIds['Swords of Sanghelios'], 'force')]));
+  if (u._extraMods) mods.push(...u._extraMods);
 
   // forced Command Vehicle (+10 pts)
   if (!isInf && u.type !== 'Aircraft' && !['Infantry', 'Team', 'Artillery'].includes(u.type) && String(u.forceOrgSlot || '').toLowerCase() !== 'transport'
@@ -864,6 +924,7 @@ function buildUnit(fac, arr, u, ctx) {
   });
 }
 
+const BORROWED = [];
 // ---------- catalogue builder ----------
 const FACS = {
   UNSC: { name: 'UNSC', unitsKey: 'UNSC_UNITS', vehKey: 'UNSC_VEHICLES', variants: [{ n: 'UNSC', army: 'UNSC' }, { n: 'Insurrection', army: 'Insurrection' }], castes: false },
@@ -910,12 +971,40 @@ function buildCat(fac) {
     categoryLinks: [tag('categoryLink', { id: cid('cl|setup'), name: 'Army Setup', hidden: 'false', targetId: catId['Army Setup'], primary: 'true' })]
   });
   const out = [setupXml];
+  ctx.leaderIds = {};
+  for (const army of F.variants.map(v => v.army)) for (const L of (O.LEADER_DEFS[army] || [])) ctx.leaderIds[army + '|' + L.id] = cid('leader|' + army + '|' + L.id);
   for (const [arr, key] of [[F.unitsKey, F.unitsKey], [F.vehKey, F.vehKey]]) for (const u of O[key]) out.push(buildUnit(fac, arr, u, ctx));
+  // Yapyap the Destroyer: Banished vehicles join the Covenant list
+  if (fac === 'Covenant' && ctx.leaderIds['Covenant|yapyap']) {
+    const have = new Set(O.COVENANT_VEHICLES.map(v => v.type + '::' + v.name));
+    for (const v of O.BANISHED_VEHICLES) {
+      if (have.has(v.type + '::' + v.name)) continue;
+      const c = JSON.parse(JSON.stringify(v));
+      c._extraMods = [hideWhen([condAtLeast(ctx.leaderIds['Covenant|yapyap'], 'force', 'lessThan')])];
+      c._note = 'Banished vehicle: only available with Yapyap the Destroyer as Army Leader.';
+      out.push(buildUnit(fac, 'BANISHED_VEHICLES', c, ctx));
+      BORROWED.push('Covenant (Yapyap) <- Banished: ' + v.name);
+    }
+  }
+  // Flood Corrupted Arsenal: any other faction's vehicle that can be Inexperienced, as Inexperienced only
+  if (fac === 'Flood') {
+    for (const [src, key] of [['UNSC', 'UNSC_VEHICLES'], ['Covenant', 'COVENANT_VEHICLES'], ['Banished', 'BANISHED_VEHICLES'], ['Forerunner', 'FORERUNNER_VEHICLES']]) {
+      for (const v of O[key]) {
+        if (!(v.allowedVeterancy || []).includes('Inexperienced')) continue;
+        const c = JSON.parse(JSON.stringify(v));
+        c.allowedVeterancy = ['Inexperienced'];
+        c.name = v.name + ' [Corrupted Arsenal]';
+        c._note = `Corrupted Arsenal: ${src} vehicle, Inexperienced only.`;
+        out.push(buildUnit(fac, key, c, ctx));
+        BORROWED.push('Flood <- ' + src + ': ' + v.name);
+      }
+    }
+  }
   // leaders
   const variantsForLeaders = F.variants.map(v => v.army);
   for (const army of variantsForLeaders) {
     for (const L of (O.LEADER_DEFS[army] || [])) {
-      const lid = cid('leader|' + army + '|' + L.id);
+      const lid = ctx.leaderIds[army + '|' + L.id];
       const req = leaderReqs(L.id);
       const mods = [];
       const main = F.variants[0].n, vid = variantIds[army];
@@ -941,6 +1030,8 @@ for (const f of Object.keys(FACS)) catXml[f] = buildCat(f);
 fs.writeFileSync(path.join(OUTDIR, 'Halo Bolt Action.gst'), buildGst());
 for (const f of Object.keys(FACS)) fs.writeFileSync(path.join(OUTDIR, `Halo - ${FACS[f].name}.cat`), catXml[f]);
 console.log('armoury notes:', armouryReport);
+console.log('added from PDFs:', PDF_ADDED_UNITS);
+console.log('borrowed vehicles:', BORROWED.length);
 console.log('limited rules:', limitedReport);
 console.log('leaders without requirement mapping:', unknownLeaders);
 console.log('stub rules (no description in source):', [...stubRules]);

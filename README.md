@@ -36,4 +36,15 @@ M301 packages and leader melee combos (ported)
 - Leader melee (Covenant and Banished): once a unit has Melee Weapon or Melee Weapons, Elites can take Plasma Rifle/Needler + Plasma Sword (+5) and Brutes can swap Spiker/Plasma Rifle for a Gravity Hammer (0). Tough Fighters units get the 1 pt discount. Officers, Chaplains, Bloodhandlers and Forward Observers get these as a separate "Leader Melee Upgrade" choice instead of an NCO weapon.
 - Swords and hammers only appear for the matching caste (Elite or Brute doctrine, or an Elite/Brute unit).
 
-Rules with no description in the HTML (stubbed, fill in text): Reinforced Front Armour, Slow Load, Weak Sides, Faster, Slower, Command Vehicle, Open-topped, Medical Vehicle, Fist, Agile, Recce, Shielded Hull, All-Terrain, Nimble, Rappelling Lines, Impulse Drive, Sustained Beam, Gravity Lift, Unreliable, Scrap Armour Screens, and the three doctrine trigger rules (For Humanity's Survival!, For The Great Journey!, Forged In Chains).
+Filled in from the rules PDFs (Rulebook v3.7, army books v3.7/v1.3, Leaders v1.2)
+- Rule text for the 23 rules the HTML had no description for (vehicle rules from the Rulebook, All-Terrain, Rappelling Lines, Gravity Lift, Scrap Armour Screens, and short versions of the three doctrine rules).
+- Banished Flamethrower Team (60/75 pts, 2 Grunts, Ravager), which is in Armies of the Banished but missing from the HTML.
+- Army restrictions: Spartan units are hidden in an Insurrection army; Brute units are hidden in a Swords of Sanghelios army (the HTML did this too).
+- Yapyap the Destroyer: Banished vehicles the Covenant list doesn't have appear once he's the Army Leader.
+- Flood "Corrupted Arsenal": vehicles from the other armies that can be Inexperienced, marked "[Corrupted Arsenal]", Inexperienced only.
+
+- Slow Load, Unreliable and Medical Vehicle use the Bolt Action 3rd Edition rulebook text (p151, p149).
+- "Slower" uses the Rulebook's vehicle "Slow" rule (6" Advance, 12" Run).
+- Points: the v3.7 army books win where they differ from the HTML. Every unit's base cost was checked; only the AV-49 Wasp differed (Veteran 138 -> 135). Override list: COST_OVERRIDES in tools/build.js.
+- Option and upgrade costs were also checked against the army books and Optional Rules v1.8. Fixed (OPTION_FIXES in tools/build.js): Flood Elite Combat Form Squad gains the missing "Unarmed for -8pts" swap; Covenant Attached Brute swaps are Mauler -6, Covenant Carbine -4, Plasma Rifle -1; Banished Attached Brute swaps are Mangler -5, Pulse Carbine -3, Plasma Rifle -1. Everything else matched. Upgrade limits (how many models may take an option) were not compared.
+- Banished Attached Brute: the PDF lists "Engineers: If Engineers are taken" under its rules but no Engineers option; the HTML's +1pt Engineers option is kept.
