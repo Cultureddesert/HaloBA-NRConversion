@@ -28,6 +28,13 @@ Datasheet and editing
 - Weapon rules (e.g. Range Finder, Howitzer) appear in a unit's rules only for weapons it carries: starting weapons' rules are on the unit, and an option that adds a weapon brings that weapon's rules with it.
 - Lists made with an earlier version of these files: the old "Additional Models" option became "Models", so re-check unit sizes in saved lists.
 
+Heroes (Optional Rules v1.8)
+- Turn on "Use Heroes (Optional Rules)" in Army Setup (UNSC, Covenant and Banished; there are no Forerunner or Flood Heroes).
+- A "Hero" choice then appears on Officer - Platoon/Company Commander units, showing only the Heroes whose commander matches: Veteran, the right doctrine (Grunt/Jackal for Yapyap; any doctrine for Carter-A259) and Platoon vs Company Commander.
+- A Hero costs nothing extra and replaces the commander: the unit profile takes the Hero's name, and the unit gets the Hero's pools and Active ability plus the shared "Hero Resources" rules.
+- Only one Hero per list. Picking a Hero and then changing the commander's veterancy or doctrine shows an error.
+- The cinematic Master Chief variant is not included.
+
 Army validation (ported)
 New Recruit flags these as list errors, same as the HTML's "illegal list" warnings:
 - At least 1 Platoon Commander, and 2 Rifle Platoon Infantry units per Platoon Commander (minimum 2). Medics, Forward Observers/Watchers, Chaplains/Bloodhandlers, Company Commanders and attached leaders don't count as Rifle Platoon Infantry.
